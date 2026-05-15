@@ -1,0 +1,47 @@
+{
+  "name": "by",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "optimize:images": "node scripts/convert-all-to-webp.mjs",
+    "optimize:images:dry-run": "node scripts/convert-all-to-webp.mjs --dry-run",
+    "optimize:videos": "node scripts/optimize-videos.mjs",
+    "optimize:videos:dry-run": "node scripts/optimize-videos.mjs --dry-run",
+    "optimize:videos:no-patch": "node scripts/optimize-videos.mjs --no-patch",
+    "optimize:videos:bulk": "node scripts/optimize-videos.mjs --no-hero",
+    "optimize:videos:force": "node scripts/optimize-videos.mjs --force",
+    "optimize:videos:webm": "node scripts/optimize-videos.mjs --webm-only",
+    "optimize:videos:webm:dry-run": "node scripts/optimize-videos.mjs --webm-only --dry-run",
+    "optimize:videos:webm:force": "node scripts/optimize-videos.mjs --webm-only --force",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "validate": "npm run lint && npm run build",
+    "schema:count": "node scripts/count-schema.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.16.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.6.0",
+    "sharp": "^0.34.5",
+    "vite": "^8.0.12"
+  }
+}
