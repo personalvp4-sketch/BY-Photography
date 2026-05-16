@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import weddingImg from '../assets/Photos-20260514T180500Z-3-001/Photos/wedding/DSC_3951.webp';
 
 const heroImages = [
-  { url: '/assets/hero/wedding.webp', title: 'ETERNAL BONDS', subtitle: 'The Wedding Premiere' },
+  { url: weddingImg, title: 'ETERNAL BONDS', subtitle: 'The Wedding Premiere' },
   { url: '/assets/hero/prewedding.webp', title: 'POETIC LOVE', subtitle: 'Pre-Wedding Cinema' },
   { url: '/assets/hero/maternity.webp', title: 'THE GENESIS', subtitle: 'Maternity Portraits' },
   { url: '/assets/hero/baby.webp', title: 'PURE WONDER', subtitle: 'Baby Shoot Editorial' },

@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import weddingImg from '../assets/Photos-20260514T180500Z-3-001/Photos/wedding/DSC_3951.webp';
 
 const MotionLink = motion.create(Link);
 
 const images = [
-  { id: 1, bootstrapClasses: 'col-lg-6 col-md-12', title: 'The Wedding Premiere', slug: 'wedding', coverSrc: '/assets/hero/wedding.webp' },
+  { id: 1, bootstrapClasses: 'col-lg-6 col-md-12', title: 'The Wedding Premiere', slug: 'wedding', coverSrc: weddingImg },
   { id: 2, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Babyshoot', slug: 'baby-shoot', coverSrc: '/assets/hero/baby.webp' },
   { id: 3, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Pre Wedding', slug: 'pre-wedding', coverSrc: '/assets/hero/prewedding.webp' },
   { id: 6, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Cinematic Portfolio', slug: 'cinematic-portfolio', videoSrc: '/portfolio/Gowri Intro.webm' }, 

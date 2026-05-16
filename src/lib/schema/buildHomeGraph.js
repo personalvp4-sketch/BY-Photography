@@ -30,7 +30,7 @@ import heroBaby from '../../assets/hero/baby.webp';
 import heroHousewarming from '../../assets/hero/housewarming.webp';
 import heroMaternity from '../../assets/hero/maternity.webp';
 import heroPrewedding from '../../assets/hero/prewedding.webp';
-import heroWedding from '../../assets/hero/wedding.webp';
+import heroWedding from '../../assets/Photos-20260514T180500Z-3-001/Photos/wedding/DSC_3951.webp';
 
 const HERO_SLIDES = [
   { name: 'Eternal Bonds — Wedding Premiere', src: heroWedding },
