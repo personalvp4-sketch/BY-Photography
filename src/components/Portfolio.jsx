@@ -8,7 +8,7 @@ const images = [
   { id: 2, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Babyshoot', slug: 'baby-shoot', coverSrc: '/assets/hero/baby.webp' },
   { id: 3, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Pre Wedding', slug: 'pre-wedding', coverSrc: '/assets/hero/prewedding.webp' },
   { id: 6, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Cinematic Portfolio', slug: 'cinematic-portfolio', videoSrc: '/portfolio/Gowri Intro.webm' }, 
-  { id: 4, bootstrapClasses: 'col-lg-3 col-md-6', title: 'House Warming', slug: 'housewarming', coverSrc: '/assets/hero/housewarming.webp' },
+  { id: 4, bootstrapClasses: 'col-lg-3 col-md-6', title: 'House Warming', slug: 'housewarming', coverSrc: '/assets/portfolio/housewarming-cover.webp' },
   { id: 5, bootstrapClasses: 'col-lg-6 col-md-12', title: 'Maternity', slug: 'maternity', coverSrc: '/assets/hero/maternity.webp' },
 ];
 
