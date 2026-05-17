@@ -6,7 +6,7 @@ const heroImages = [
   { url: weddingImg, title: 'ETERNAL BONDS', subtitle: 'The Wedding Premiere' },
   { url: '/assets/hero/prewedding.webp', title: 'POETIC LOVE', subtitle: 'Pre-Wedding Cinema' },
   { url: '/assets/hero/maternity.webp', title: 'THE GENESIS', subtitle: 'Maternity Portraits' },
-  { url: '/assets/hero/baby.webp', title: 'PURE WONDER', subtitle: 'Baby Shoot Editorial' },
+  { url: '/assets/hero/MAH05512.webp', title: 'PURE WONDER', subtitle: 'Baby Shoot Editorial' },
   { url: '/assets/hero/housewarming.webp', title: 'NEW CHAPTERS', subtitle: 'Housewarming Stories' },
 ];
 

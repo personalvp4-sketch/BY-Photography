@@ -26,7 +26,7 @@ import {
   wrapGraph,
 } from './builders.js';
 
-import heroBaby from '../../assets/hero/baby.webp';
+import heroBaby from '../../assets/hero/MAH05512.webp';
 import heroHousewarming from '../../assets/hero/housewarming.webp';
 import heroMaternity from '../../assets/hero/maternity.webp';
 import heroPrewedding from '../../assets/hero/prewedding.webp';
