@@ -1,16 +1,16 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import weddingImg from '../assets/Photos-20260514T180500Z-3-001/Photos/wedding/DSC_3951.webp';
+
 
 const MotionLink = motion.create(Link);
 
 const images = [
-  { id: 1, bootstrapClasses: 'col-lg-6 col-md-12', title: 'The Wedding Premiere', slug: 'wedding', coverSrc: weddingImg },
+  { id: 1, bootstrapClasses: 'col-lg-6 col-md-12', title: 'The Wedding Premiere', slug: 'wedding', coverSrc: '/assets/hero/54.webp' },
   { id: 2, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Babyshoot', slug: 'baby-shoot', coverSrc: '/assets/hero/1765560781055.webp' },
-  { id: 3, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Pre Wedding', slug: 'pre-wedding', coverSrc: '/assets/hero/prewedding.webp' },
+  { id: 3, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Pre Wedding', slug: 'pre-wedding', coverSrc: '/assets/hero/53.webp' },
   { id: 6, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Cinematic Portfolio', slug: 'cinematic-portfolio', videoSrc: '/portfolio/Gowri Intro.webm' }, 
   { id: 4, bootstrapClasses: 'col-lg-3 col-md-6', title: 'House Warming', slug: 'housewarming', coverSrc: '/assets/portfolio/housewarming-cover.webp' },
-  { id: 5, bootstrapClasses: 'col-lg-6 col-md-12', title: 'Maternity', slug: 'maternity', coverSrc: '/assets/hero/maternity.webp' },
+  { id: 5, bootstrapClasses: 'col-lg-6 col-md-12', title: 'Maternity', slug: 'maternity', coverSrc: '/assets/hero/DSC00314.webp' },
 ];
 
 const Portfolio = () => {
@@ -34,12 +34,11 @@ const Portfolio = () => {
             <div key={img.id} className={img.bootstrapClasses}>
               <MotionLink
                 to={`/gallery/${img.slug}`}
-                className="portfolio-tile-link fire-border h-100"
+                className="portfolio-tile-link fire-border"
                 style={{
                   position: 'relative',
                   overflow: 'hidden',
-                  borderRadius: 'var(--radius-md)',
-                  minHeight: img.bootstrapClasses.includes('col-lg-6') ? '400px' : '280px'
+                  borderRadius: 'var(--radius-md)'
                 }}
                 initial={{ opacity: 0, scale: 0.96 }}
                 whileInView={{ opacity: 1, scale: 1 }}

@@ -27,10 +27,10 @@ import {
 } from './builders.js';
 
 import heroBaby from '../../assets/hero/MAH05512.webp';
-import heroHousewarming from '../../assets/hero/housewarming.webp';
-import heroMaternity from '../../assets/hero/maternity.webp';
-import heroPrewedding from '../../assets/hero/prewedding.webp';
-import heroWedding from '../../assets/Photos-20260514T180500Z-3-001/Photos/wedding/DSC_3951.webp';
+import heroHousewarming from '../../assets/hero/URS07319.webp';
+import heroMaternity from '../../assets/hero/DSC00330.webp';
+import heroPrewedding from '../../assets/hero/MAH09784.webp';
+import heroWedding from '../../assets/hero/56.webp';
 
 const HERO_SLIDES = [
   { name: 'Eternal Bonds — Wedding Premiere', src: heroWedding },

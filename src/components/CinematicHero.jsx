@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import weddingImg from '../assets/Photos-20260514T180500Z-3-001/Photos/wedding/DSC_3951.webp';
+
 
 const heroImages = [
-  { url: weddingImg, title: 'ETERNAL BONDS', subtitle: 'The Wedding Premiere' },
-  { url: '/assets/hero/prewedding.webp', title: 'POETIC LOVE', subtitle: 'Pre-Wedding Cinema' },
-  { url: '/assets/hero/maternity.webp', title: 'THE GENESIS', subtitle: 'Maternity Portraits' },
+  { url: '/assets/hero/56.webp', title: 'ETERNAL BONDS', subtitle: 'The Wedding Premiere' },
+  { url: '/assets/hero/MAH09784.webp', title: 'POETIC LOVE', subtitle: 'Pre-Wedding Cinema' },
+  { url: '/assets/hero/DSC00330.webp', title: 'THE GENESIS', subtitle: 'Maternity Portraits' },
   { url: '/assets/hero/MAH05512.webp', title: 'PURE WONDER', subtitle: 'Baby Shoot Editorial' },
-  { url: '/assets/hero/housewarming.webp', title: 'NEW CHAPTERS', subtitle: 'Housewarming Stories' },
+  { url: '/assets/hero/URS07319.webp', title: 'NEW CHAPTERS', subtitle: 'Housewarming Stories' },
 ];
 
 const PARTICLE_COUNT = 20;
@@ -35,27 +35,12 @@ const CinematicHero = () => {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  // LCP: preload first slide only at high priority; defer other slides so they do not compete
   useEffect(() => {
-    const toRemove = [];
-
-    const first = document.createElement('link');
-    first.rel = 'preload';
-    first.as = 'image';
-    first.href = heroImages[0].url;
-    first.setAttribute('fetchpriority', 'high');
-    document.head.appendChild(first);
-    toRemove.push(first);
-
+    // Warm up the image cache for upcoming slides without triggering preload warnings
     const preloadRest = () => {
       heroImages.slice(1).forEach(({ url }) => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = url;
-        link.setAttribute('fetchpriority', 'low');
-        document.head.appendChild(link);
-        toRemove.push(link);
+        const img = new window.Image();
+        img.src = url;
       });
     };
 
@@ -70,7 +55,6 @@ const CinematicHero = () => {
     return () => {
       if (idleId !== undefined) cancelIdleCallback(idleId);
       if (timeoutId !== undefined) clearTimeout(timeoutId);
-      toRemove.forEach((el) => el.remove());
     };
   }, []);
 
