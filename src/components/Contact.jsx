@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { AtSign, MessageCircle, Phone } from 'lucide-react';
 
 const WHATSAPP_E164 = '918553702039';
@@ -45,13 +44,7 @@ const Contact = () => {
 
         <div className="row g-4 g-lg-5 align-items-stretch">
           <div className="col-lg-6">
-            <motion.div
-              className="contact-copy-card glass-strong fire-border contact-copy-elevated h-100"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <div className="contact-copy-card glass-strong fire-border contact-copy-elevated h-100 reveal-block">
               <h2 className="contact-hero-title">
                 <span className="contact-hero-title__line">BEGIN YOUR</span>
                 <span className="contact-hero-title__line contact-hero-title__line--fire">JOURNEY</span>
@@ -106,16 +99,12 @@ const Contact = () => {
                   </a>
                 </li>
               </ul>
-            </motion.div>
+            </div>
           </div>
 
           <div className="col-lg-6">
-            <motion.form
-              className="contact-form-card glass-fire-accent fire-border contact-form-elevated h-100"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.75, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
+            <form
+              className="contact-form-card glass-fire-accent fire-border contact-form-elevated h-100 reveal-block"
               onSubmit={handleSubmit}
             >
               <div className="contact-form-head">
@@ -176,7 +165,7 @@ const Contact = () => {
                 <span className="contact-submit-btn__main">Open in WhatsApp</span>
                 <span className="contact-submit-btn__sub">Pre-filled from this form</span>
               </button>
-            </motion.form>
+            </form>
           </div>
         </div>
       </div>

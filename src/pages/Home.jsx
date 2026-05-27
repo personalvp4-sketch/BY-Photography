@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Aperture, Clapperboard, Sparkles } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useRevealScan } from '../hooks/useRevealScan.js';
 import { buildHomeGraph } from '../lib/schema/buildHomeGraph';
 import CinematicHero from '../components/CinematicHero';
-import Portfolio from '../components/Portfolio';
-import Contact from '../components/Contact';
+
+const Portfolio = lazy(() => import('../components/Portfolio'));
+const Contact = lazy(() => import('../components/Contact'));
 
 const SERVICE_ITEMS = ['Weddings', 'Portraits', 'Drone', 'Commercial'];
 
@@ -31,35 +32,42 @@ const ABOUT_PILLARS = [
 
 export default function Home() {
   const [jsonLd, setJsonLd] = useState(null);
+  const mainRef = useRef(null);
 
   usePageMeta();
   useJsonLd(jsonLd);
+  useRevealScan(mainRef);
 
   useEffect(() => {
     let cancelled = false;
-    buildHomeGraph().then((graph) => {
-      if (!cancelled) setJsonLd(graph);
-    });
+    const apply = () => {
+      buildHomeGraph().then((graph) => {
+        if (!cancelled) setJsonLd(graph);
+      });
+    };
+    let idleId;
+    let timeoutId;
+    if (typeof requestIdleCallback !== 'undefined') {
+      idleId = requestIdleCallback(apply, { timeout: 4000 });
+    } else {
+      timeoutId = window.setTimeout(apply, 1);
+    }
     return () => {
       cancelled = true;
+      if (idleId !== undefined) cancelIdleCallback(idleId);
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
   }, []);
 
   return (
     <div className="app">
       <Navbar />
-      <main className="app-main">
+      <main ref={mainRef} className="app-main">
         <CinematicHero />
 
         <section id="about" className="section section-about">
           <div className="container about-showcase-wrap">
-            <motion.article
-              className="about-showcase glass-strong glass-card fire-border"
-              initial={{ opacity: 0, y: 28 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <article className="about-showcase glass-strong glass-card fire-border reveal-block">
               <span className="about-showcase__glow" aria-hidden />
               <span className="about-showcase__watermark" aria-hidden>
                 01
@@ -87,28 +95,15 @@ export default function Home() {
 
                 <div className="col-lg-7">
                   <div className="about-showcase__body-col">
-                    <motion.p
-                      className="about-lead about-lead--showcase"
-                      initial={{ opacity: 0, y: 18 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-40px' }}
-                      transition={{ duration: 0.75, delay: 0.08 }}
-                    >
+                    <p className="about-lead about-lead--showcase">
                       We believe photography is more than capturing a moment—it&apos;s about preserving a
                       feeling. Our &quot;Director&apos;s Cut&quot; approach ensures every frame we deliver is
                       a cinematic masterpiece, crafted with intent and delivered with soul.
-                    </motion.p>
+                    </p>
 
                     <ul className="about-pillars">
-                      {ABOUT_PILLARS.map(({ Icon, title, text }, i) => (
-                        <motion.li
-                          key={title}
-                          className="about-pillar glass-subtle fire-border"
-                          initial={{ opacity: 0, y: 16 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, margin: '-30px' }}
-                          transition={{ duration: 0.55, delay: 0.12 + i * 0.08 }}
-                        >
+                      {ABOUT_PILLARS.map(({ Icon, title, text }) => (
+                        <li key={title} className="about-pillar glass-subtle fire-border">
                           <span className="about-pillar__icon" aria-hidden>
                             <Icon strokeWidth={1.35} size={22} />
                           </span>
@@ -116,13 +111,13 @@ export default function Home() {
                             <span className="about-pillar__title">{title}</span>
                             <span className="about-pillar__desc">{text}</span>
                           </span>
-                        </motion.li>
+                        </li>
                       ))}
                     </ul>
                   </div>
                 </div>
               </div>
-            </motion.article>
+            </article>
           </div>
         </section>
 
@@ -158,9 +153,13 @@ export default function Home() {
           </div>
         </section>
 
-        <Portfolio />
+        <Suspense fallback={<div className="section" style={{ minHeight: '30vh' }} aria-hidden />}>
+          <Portfolio />
+        </Suspense>
 
-        <Contact />
+        <Suspense fallback={<div className="section" style={{ minHeight: '24vh' }} aria-hidden />}>
+          <Contact />
+        </Suspense>
       </main>
 
       <footer className="site-footer">

@@ -26,18 +26,13 @@ import {
   wrapGraph,
 } from './builders.js';
 
-import heroBaby from '../../assets/hero/MAH05512.webp';
-import heroHousewarming from '../../assets/hero/URS07319.webp';
-import heroMaternity from '../../assets/hero/DSC00330.webp';
-import heroPrewedding from '../../assets/hero/MAH09784.webp';
-import heroWedding from '../../assets/hero/56.webp';
-
+/** Public responsive URLs for JSON-LD (avoid bundling multi‑MB src assets). */
 const HERO_SLIDES = [
-  { name: 'Eternal Bonds — Wedding Premiere', src: heroWedding },
-  { name: 'Poetic Love — Pre-Wedding Cinema', src: heroPrewedding },
-  { name: 'The Genesis — Maternity Portraits', src: heroMaternity },
-  { name: 'Pure Wonder — Baby Shoot Editorial', src: heroBaby },
-  { name: 'New Chapters — Housewarming Stories', src: heroHousewarming },
+  { name: 'Eternal Bonds — Wedding Premiere', path: '/assets/hero/56-1200.webp' },
+  { name: 'Poetic Love — Pre-Wedding Cinema', path: '/assets/hero/MAH09784-1200.webp' },
+  { name: 'The Genesis — Maternity Portraits', path: '/assets/hero/DSC00330-1200.webp' },
+  { name: 'Pure Wonder — Baby Shoot Editorial', path: '/assets/hero/MAH05512-1200.webp' },
+  { name: 'New Chapters — Housewarming Stories', path: '/assets/hero/URS07319-1200.webp' },
 ];
 
 const NAV_LINKS = [
@@ -125,7 +120,7 @@ export async function buildHomeGraph() {
       imageObjectEntity({
         id: `${origin}/#hero-${index}`,
         name: slide.name,
-        contentUrl: absoluteUrl(slide.src),
+        contentUrl: absoluteUrl(slide.path),
         caption: slide.name,
         isPartOf: { '@id': `${origin}/#webpage` },
         position: index + 1,

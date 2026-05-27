@@ -1,87 +1,117 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import OptimizedImg from './OptimizedImg.jsx';
+import LazyAutoplayVideo from './LazyAutoplayVideo.jsx';
+import { RASTER_IMG_WIDTHS } from '../lib/responsiveImage.js';
 
+const TILE_SIZES = '(max-width: 599px) 100vw, (max-width: 991px) 50vw, 28vw';
 
-const MotionLink = motion.create(Link);
-
-const images = [
-  { id: 1, bootstrapClasses: 'col-lg-6 col-md-12', title: 'The Wedding Premiere', slug: 'wedding', coverSrc: '/assets/hero/54.webp' },
-  { id: 2, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Babyshoot', slug: 'baby-shoot', coverSrc: '/assets/hero/1765560781055.webp' },
-  { id: 3, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Pre Wedding', slug: 'pre-wedding', coverSrc: '/assets/hero/53.webp' },
-  { id: 6, bootstrapClasses: 'col-lg-3 col-md-6', title: 'Cinematic Portfolio', slug: 'cinematic-portfolio', videoSrc: '/portfolio/Gowri Intro.webm' }, 
-  { id: 4, bootstrapClasses: 'col-lg-3 col-md-6', title: 'House Warming', slug: 'housewarming', coverSrc: '/assets/portfolio/housewarming-cover.webp' },
-  { id: 5, bootstrapClasses: 'col-lg-6 col-md-12', title: 'Maternity', slug: 'maternity', coverSrc: '/assets/hero/DSC00314.webp' },
+const tiles = [
+  {
+    id: 1,
+    bootstrapClasses: 'col-lg-6 col-md-12',
+    title: 'The Wedding Premiere',
+    slug: 'wedding',
+    stem: '/assets/hero/54',
+    fallback: '/assets/hero/54.webp',
+  },
+  {
+    id: 2,
+    bootstrapClasses: 'col-lg-3 col-md-6',
+    title: 'Babyshoot',
+    slug: 'baby-shoot',
+    stem: '/assets/hero/1765560781055',
+    fallback: '/assets/hero/1765560781055.webp',
+  },
+  {
+    id: 3,
+    bootstrapClasses: 'col-lg-3 col-md-6',
+    title: 'Pre Wedding',
+    slug: 'pre-wedding',
+    stem: '/assets/hero/53',
+    fallback: '/assets/hero/53.webp',
+  },
+  {
+    id: 6,
+    bootstrapClasses: 'col-lg-3 col-md-6',
+    title: 'Cinematic Portfolio',
+    slug: 'cinematic-portfolio',
+    videoSrc: '/portfolio/Gowri Intro.webm',
+    poster: '/portfolio/Gowri Intro-poster.webp',
+    mobileFallback: '/assets/hero/53.webp',
+  },
+  {
+    id: 4,
+    bootstrapClasses: 'col-lg-3 col-md-6',
+    title: 'House Warming',
+    slug: 'housewarming',
+    stem: '/assets/portfolio/housewarming-cover',
+    fallback: '/assets/portfolio/housewarming-cover.webp',
+  },
+  {
+    id: 5,
+    bootstrapClasses: 'col-lg-6 col-md-12',
+    title: 'Maternity',
+    slug: 'maternity',
+    stem: '/assets/hero/DSC00314',
+    fallback: '/assets/hero/DSC00314.webp',
+  },
 ];
 
 const Portfolio = () => {
   return (
     <section id="portfolio" className="section">
       <div className="container">
-        <motion.div
-          className="portfolio-intro glass-subtle fire-border"
+        <div
+          className="portfolio-intro glass-subtle fire-border reveal-block"
           style={{ borderRadius: 'var(--radius-lg)', padding: 'clamp(1.25rem, 4vw, 2rem)' }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-40px' }}
-          transition={{ duration: 0.8 }}
         >
           <span className="portfolio-kicker">GALLERY</span>
           <h2 style={{ marginTop: '0.75rem' }}>FRAMES THAT SPEAK</h2>
-        </motion.div>
+        </div>
 
         <div className="row g-3 g-lg-4">
-          {images.map((img, index) => (
+          {tiles.map((img) => (
             <div key={img.id} className={img.bootstrapClasses}>
-              <MotionLink
+              <Link
                 to={`/gallery/${img.slug}`}
                 className="portfolio-tile-link fire-border"
                 style={{
                   position: 'relative',
                   overflow: 'hidden',
-                  borderRadius: 'var(--radius-md)'
+                  borderRadius: 'var(--radius-md)',
                 }}
-                initial={{ opacity: 0, scale: 0.96 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.65, delay: index * 0.06 }}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
               >
                 <div className="portfolio-tile-media">
                   {img.videoSrc ? (
-                    <video
+                    <LazyAutoplayVideo
                       className="portfolio-tile-cover"
                       src={img.videoSrc}
-                      muted
-                      loop
-                      autoPlay
-                      playsInline
+                      poster={img.poster}
+                      fallbackImg={img.mobileFallback}
                     />
                   ) : (
-                    <img
-                      className="portfolio-tile-cover"
-                      src={img.coverSrc}
+                    <OptimizedImg
+                      stem={img.stem}
+                      fallbackSrc={img.fallback}
                       alt={`${img.title} — preview`}
+                      sizes={TILE_SIZES}
+                      widths={RASTER_IMG_WIDTHS}
+                      defaultWidth={1200}
+                      className="portfolio-tile-cover"
                       loading="lazy"
                       decoding="async"
-                      sizes="(max-width: 599px) 100vw, (max-width: 991px) 50vw, 25vw"
                     />
                   )}
                   <div className="portfolio-tile-scrim" aria-hidden />
                 </div>
 
-                <motion.div
-                  className="portfolio-tile-hover"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.35 }}
-                />
+                <div className="portfolio-tile-hover" aria-hidden />
 
                 <div className="portfolio-tile-footer">
                   <h4 className="portfolio-tile-title">{img.title}</h4>
                   <p className="portfolio-tile-cta">VIEW PROJECT</p>
                 </div>
-              </MotionLink>
+              </Link>
             </div>
           ))}
         </div>

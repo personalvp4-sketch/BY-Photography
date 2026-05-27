@@ -1,18 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
+import GalleryVideoThumb from '../components/GalleryVideoThumb.jsx';
+import OptimizedImg from '../components/OptimizedImg.jsx';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { usePageMeta } from '../hooks/usePageMeta';
 import { isValidGallerySlug, loadGalleryItems, SLUG_TO_LABEL } from '../lib/galleryAssets';
+import { RASTER_IMG_WIDTHS, stemFromPublicWebp } from '../lib/responsiveImage.js';
 import { buildGalleryGraph } from '../lib/schema/buildGalleryGraph';
+
+const GRID_SIZES = '(max-width: 520px) 50vw, (max-width: 900px) 33vw, 22vw';
+const LIGHTBOX_SIZES = '95vw';
 
 function GalleryContent({ slug, title }) {
   const [items, setItems] = useState([]);
   const [loadState, setLoadState] = useState('loading');
   const [lightbox, setLightbox] = useState(null);
   const closeBtnRef = useRef(null);
+  const headerRef = useRef(null);
+  const gridRef = useRef(null);
 
   usePageMeta({
     title,
@@ -66,6 +73,42 @@ function GalleryContent({ slug, title }) {
       window.removeEventListener('keydown', onKey);
     };
   }, [lightbox, items.length]);
+
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+          io.disconnect();
+        }
+      },
+      { threshold: 0.06, rootMargin: '0px 0px -5% 0px' }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const root = gridRef.current;
+    if (!root || loadState !== 'ready') return undefined;
+    const cells = root.querySelectorAll('.gallery-page-cell');
+    if (!cells.length) return undefined;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '60px 0px', threshold: 0.04 }
+    );
+    cells.forEach((c) => io.observe(c));
+    return () => io.disconnect();
+  }, [loadState, items]);
 
   const lightboxNode =
     lightbox !== null && items[lightbox] ? (
@@ -122,14 +165,20 @@ function GalleryContent({ slug, title }) {
                 autoPlay
                 loop
                 playsInline
+                preload="metadata"
               />
             ) : (
-              <img
-                src={items[lightbox].src}
+              <OptimizedImg
+                stem={stemFromPublicWebp(items[lightbox].src)}
+                fallbackSrc={items[lightbox].src}
                 alt={`${title} — ${items[lightbox].file.replace(/\.(webp|webm)$/i, '')}, full size`}
                 className="gallery-lightbox-img"
+                sizes={LIGHTBOX_SIZES}
+                widths={RASTER_IMG_WIDTHS}
+                defaultWidth={1200}
                 decoding="async"
                 fetchPriority="high"
+                loading="eager"
               />
             )}
           </div>
@@ -142,11 +191,7 @@ function GalleryContent({ slug, title }) {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <div ref={headerRef} className="gallery-page-header">
         <h1 style={{ marginBottom: '0.35rem' }}>{title}</h1>
         {loadState === 'loading' ? (
           <p className="gallery-loading" role="status">
@@ -162,7 +207,7 @@ function GalleryContent({ slug, title }) {
             {items.length === 1 ? '' : 's'} in this collection.
           </p>
         )}
-      </motion.div>
+      </div>
 
       {loadState === 'ready' && items.length === 0 ? (
         <p className="glass-card glass" style={{ padding: '2rem', borderRadius: 'var(--radius-md)' }}>
@@ -171,17 +216,12 @@ function GalleryContent({ slug, title }) {
       ) : null}
 
       {loadState === 'ready' && items.length > 0 ? (
-        <div className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
+        <div ref={gridRef} className="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3">
           {items.map(({ src, file, type }, i) => {
             const label = file.replace(/\.(webp|webm)$/i, '');
             return (
               <div key={file} className="col">
-                <motion.figure
-                  className="gallery-page-cell glass-subtle fire-border h-100"
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.35, delay: Math.min(i * 0.02, 0.4) }}
-                >
+                <figure className="gallery-page-cell glass-subtle fire-border h-100">
                   <button
                     type="button"
                     className="gallery-page-thumb"
@@ -189,28 +229,23 @@ function GalleryContent({ slug, title }) {
                     onClick={() => setLightbox(i)}
                   >
                     {type === 'video' ? (
-                      <video
-                        src={src}
-                        className="gallery-page-img"
-                        muted
-                        loop
-                        playsInline
-                        preload="metadata"
-                        style={{ objectFit: 'cover', height: '100%' }}
-                      />
+                      <GalleryVideoThumb videoSrc={src} className="gallery-page-img" />
                     ) : (
-                      <img
-                        src={src}
+                      <OptimizedImg
+                        stem={stemFromPublicWebp(src)}
+                        fallbackSrc={src}
                         alt=""
+                        className="gallery-page-img"
+                        sizes={GRID_SIZES}
+                        widths={RASTER_IMG_WIDTHS}
+                        defaultWidth={800}
                         loading="lazy"
                         decoding="async"
-                        className="gallery-page-img"
-                        sizes="(max-width: 520px) 50vw, (max-width: 900px) 33vw, 25vw"
                       />
                     )}
                   </button>
                   <figcaption className="gallery-page-caption">{label}</figcaption>
-                </motion.figure>
+                </figure>
               </div>
             );
           })}
@@ -233,7 +268,7 @@ function GalleryContent({ slug, title }) {
 export default function GalleryPage() {
   const { slug } = useParams();
   const valid = isValidGallerySlug(slug);
-  const title = valid ? SLUG_TO_LABEL[slug] : '';
+  const pageTitle = valid ? SLUG_TO_LABEL[slug] : '';
 
   if (!valid) {
     return <Navigate to="/" replace />;
@@ -254,10 +289,10 @@ export default function GalleryPage() {
               <span className="gallery-breadcrumb-sep" aria-hidden>
                 /
               </span>
-              <span className="gallery-breadcrumb-current">{title}</span>
+              <span className="gallery-breadcrumb-current">{pageTitle}</span>
             </nav>
 
-            <GalleryContent key={slug} slug={slug} title={title} />
+            <GalleryContent key={slug} slug={slug} title={pageTitle} />
           </div>
         </section>
       </main>

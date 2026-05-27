@@ -34,3 +34,14 @@ src/assets/**/*.mov
 .env.*
 !.env.example
 
+# Sharp / ffmpeg build outputs (recreated by `npm run build` → prebuild on Vercel)
+public/**/*-400.webp
+public/**/*-600.webp
+public/**/*-800.webp
+public/**/*-1200.webp
+public/**/*-640.webp
+public/**/*-960.webp
+public/**/*-1280.webp
+public/**/*-1600.webp
+public/**/*-poster.webp
+

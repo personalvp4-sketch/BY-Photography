@@ -1,34 +1,73 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import OptimizedImg from './OptimizedImg.jsx';
+import { HERO_IMG_WIDTHS } from '../lib/responsiveImage.js';
 
-
-const heroImages = [
-  { url: '/assets/hero/56.webp', title: 'ETERNAL BONDS', subtitle: 'The Wedding Premiere' },
-  { url: '/assets/hero/MAH09784.webp', title: 'POETIC LOVE', subtitle: 'Pre-Wedding Cinema' },
-  { url: '/assets/hero/DSC00330.webp', title: 'THE GENESIS', subtitle: 'Maternity Portraits' },
-  { url: '/assets/hero/MAH05512.webp', title: 'PURE WONDER', subtitle: 'Baby Shoot Editorial' },
-  { url: '/assets/hero/URS07319.webp', title: 'NEW CHAPTERS', subtitle: 'Housewarming Stories' },
+const HERO_SLIDES = [
+  {
+    stem: '/assets/hero/56',
+    fallback: '/assets/hero/56.webp',
+    title: 'ETERNAL BONDS',
+    subtitle: 'The Wedding Premiere',
+  },
+  {
+    stem: '/assets/hero/MAH09784',
+    fallback: '/assets/hero/MAH09784.webp',
+    title: 'POETIC LOVE',
+    subtitle: 'Pre-Wedding Cinema',
+  },
+  {
+    stem: '/assets/hero/DSC00330',
+    fallback: '/assets/hero/DSC00330.webp',
+    title: 'THE GENESIS',
+    subtitle: 'Maternity Portraits',
+  },
+  {
+    stem: '/assets/hero/MAH05512',
+    fallback: '/assets/hero/MAH05512.webp',
+    title: 'PURE WONDER',
+    subtitle: 'Baby Shoot Editorial',
+  },
+  {
+    stem: '/assets/hero/URS07319',
+    fallback: '/assets/hero/URS07319.webp',
+    title: 'NEW CHAPTERS',
+    subtitle: 'Housewarming Stories',
+  },
 ];
 
-const PARTICLE_COUNT = 20;
+const PARTICLE_COUNT_DESKTOP = 18;
+const PARTICLE_COUNT_MOBILE = 6;
 
-const HERO_PARTICLES = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
-  id: i,
-  xDrift: Math.random() * 200 - 100,
-  duration: 5 + Math.random() * 10,
-  delay: Math.random() * 10,
-  left: `${Math.random() * 100}%`,
-  size: Math.random() * 4 + 2,
-}));
+function buildParticles(count) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    drift: `${Math.random() * 200 - 100}px`,
+    dur: `${5 + Math.random() * 10}s`,
+    delay: `${Math.random() * 10}s`,
+    left: `${Math.random() * 100}%`,
+    size: `${Math.random() * 4 + 2}px`,
+  }));
+}
 
 const CinematicHero = () => {
   const [index, setIndex] = useState(0);
   const [tiltEnabled, setTiltEnabled] = useState(false);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const [particleCount, setParticleCount] = useState(PARTICLE_COUNT_DESKTOP);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const sectionRef = useRef(null);
+  const stageRef = useRef(null);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const u = () => setReduceMotion(mq.matches);
+    u();
+    mq.addEventListener('change', u);
+    return () => mq.removeEventListener('change', u);
+  }, []);
+
+  useEffect(() => {
+    /** Skip 3D tilt on touch / coarse pointers — avoids jank and unnecessary listeners on phones. */
+    const mq = window.matchMedia('(min-width: 768px) and (pointer: fine)');
     const update = () => setTiltEnabled(mq.matches);
     update();
     mq.addEventListener('change', update);
@@ -36,97 +75,90 @@ const CinematicHero = () => {
   }, []);
 
   useEffect(() => {
-    // Warm up the image cache for upcoming slides without triggering preload warnings
-    const preloadRest = () => {
-      heroImages.slice(1).forEach(({ url }) => {
-        const img = new window.Image();
-        img.src = url;
-      });
-    };
-
-    let idleId;
-    let timeoutId;
-    if (typeof requestIdleCallback !== 'undefined') {
-      idleId = requestIdleCallback(preloadRest, { timeout: 2000 });
-    } else {
-      timeoutId = setTimeout(preloadRest, 400);
-    }
-
-    return () => {
-      if (idleId !== undefined) cancelIdleCallback(idleId);
-      if (timeoutId !== undefined) clearTimeout(timeoutId);
-    };
+    const mq = window.matchMedia('(max-width: 767px)');
+    const apply = () => setParticleCount(mq.matches ? PARTICLE_COUNT_MOBILE : PARTICLE_COUNT_DESKTOP);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
   }, []);
 
-  // Smooth mouse movement
-  const springX = useSpring(mouseX, { stiffness: 100, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 100, damping: 30 });
+  const effectiveParticleCount = reduceMotion ? 0 : particleCount;
+  const heroParticles = useMemo(() => buildParticles(effectiveParticleCount), [effectiveParticleCount]);
 
-  const rotateX = useTransform(springY, [-500, 500], [tiltEnabled ? 5 : 0, tiltEnabled ? -5 : 0]);
-  const rotateY = useTransform(springX, [-500, 500], [tiltEnabled ? -5 : 0, tiltEnabled ? 5 : 0]);
+  useEffect(() => {
+    const next = HERO_SLIDES[(index + 1) % HERO_SLIDES.length];
+    const img = new window.Image();
+    img.src = `${next.stem}-1280.webp`;
+    img.onerror = () => {
+      img.src = next.fallback;
+    };
+  }, [index]);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % heroImages.length);
+      setIndex((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 6000);
     return () => clearInterval(timer);
   }, []);
 
-  const handleMouseMove = (e) => {
-    const { clientX, clientY } = e;
-    const moveX = clientX - window.innerWidth / 2;
-    const moveY = clientY - window.innerHeight / 2;
-    mouseX.set(moveX);
-    mouseY.set(moveY);
-  };
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) return undefined;
+    if (!tiltEnabled || reduceMotion) {
+      stage.style.transform = '';
+      return undefined;
+    }
+
+    let raf = 0;
+    const pending = { x: 0, y: 0 };
+    const onMove = (e) => {
+      pending.x = (e.clientX / window.innerWidth - 0.5) * 10;
+      pending.y = (e.clientY / window.innerHeight - 0.5) * -10;
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        stage.style.transform = `perspective(1000px) rotateX(${pending.y}deg) rotateY(${pending.x}deg)`;
+      });
+    };
+
+    const el = sectionRef.current;
+    el?.addEventListener('mousemove', onMove, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      el?.removeEventListener('mousemove', onMove);
+      stage.style.transform = '';
+    };
+  }, [tiltEnabled, reduceMotion]);
+
+  const slide = HERO_SLIDES[index];
 
   return (
-    <section className="hero-section" onMouseMove={handleMouseMove}>
-      {/* Dynamic Background Image */}
-      <AnimatePresence mode="wait">
-        <motion.img
-          key={heroImages[index].url}
-          src={heroImages[index].url}
-          alt=""
-          role="presentation"
-          decoding="async"
-          fetchPriority={index === 0 ? 'high' : 'low'}
-          loading="eager"
-          draggable={false}
-          initial={{ scale: 1.1, opacity: 0, filter: 'blur(12px)' }}
-          animate={{ scale: 1, opacity: 0.6, filter: 'blur(0px)' }}
-          exit={{ scale: 1.1, opacity: 0, filter: 'blur(12px)' }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            zIndex: 1,
-          }}
-        />
-      </AnimatePresence>
+    <section ref={sectionRef} className="hero-section">
+      <OptimizedImg
+        key={slide.stem}
+        stem={slide.stem}
+        fallbackSrc={slide.fallback}
+        alt=""
+        role="presentation"
+        sizes="100vw"
+        widths={HERO_IMG_WIDTHS}
+        defaultWidth={1600}
+        className="hero-bg-layer"
+        loading={index === 0 ? 'eager' : 'lazy'}
+        decoding="async"
+        fetchPriority={index === 0 ? 'high' : 'low'}
+      />
 
-      {/* Cinematic Vignette & Color Grade */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(circle, transparent 20%, rgba(8, 8, 8, 0.9) 100%)',
-        zIndex: 2
-      }} />
-
-      {/* Parallax Content Stage */}
-      <motion.div
-        className="hero-content-stage"
+      <div
         style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle, transparent 20%, rgba(8, 8, 8, 0.9) 100%)',
+          zIndex: 2,
         }}
-      >
-        {/* Text Content */}
+      />
+
+      <div ref={stageRef} className="hero-content-stage hero-content-stage--tilt">
         <div
           className="container hero-copy d-flex flex-column align-items-center"
           style={{
@@ -136,25 +168,12 @@ const CinematicHero = () => {
             zIndex: 2,
           }}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={index}
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -50, opacity: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            >
-              <span className="hero-eyebrow">{heroImages[index].subtitle}</span>
-              <h1 className="hero-title">{heroImages[index].title}</h1>
-            </motion.div>
-          </AnimatePresence>
+          <div key={slide.title} className="hero-caption-inner">
+            <span className="hero-eyebrow">{slide.subtitle}</span>
+            <h1 className="hero-title">{slide.title}</h1>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="hero-cta-row d-flex gap-3 justify-content-center flex-wrap"
-          >
+          <div className="hero-cta-row hero-cta-row--enter d-flex gap-3 justify-content-center flex-wrap">
             <button
               type="button"
               className="fire-border"
@@ -187,68 +206,43 @@ const CinematicHero = () => {
             >
               OUR STORY
             </button>
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
 
-      {/* Atmospheric Orange Dust Particles */}
       <div className="hero-particles" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 4 }}>
-        {HERO_PARTICLES.map(({ id, xDrift, duration, delay, left, size }) => (
-          <motion.div
+        {heroParticles.map(({ id, drift, dur, delay, left, size }) => (
+          <span
             key={id}
-            animate={{
-              y: [0, -1000],
-              x: [0, xDrift],
-              opacity: [0, 0.5, 0],
-            }}
-            transition={{
-              duration,
-              repeat: Infinity,
-              delay,
-            }}
+            className="hero-particle"
             style={{
-              position: 'absolute',
-              bottom: '-50px',
-              left,
-              width: `${size}px`,
-              height: `${size}px`,
-              background: 'var(--fire)',
-              borderRadius: '50%',
-              filter: 'blur(2px)',
+              '--p-left': left,
+              '--p-size': size,
+              '--p-dur': dur,
+              '--p-delay': delay,
+              '--p-drift': drift,
             }}
           />
         ))}
       </div>
 
-      {/* Light Leaks */}
-      <motion.div
-        animate={{
-          opacity: [0.2, 0.5, 0.2],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{ duration: 8, repeat: Infinity }}
-        className="light-leak orange-glow hero-light-leak"
-        style={{ top: '-20%', left: '-20%' }}
+      <div
+        className="light-leak orange-glow hero-light-leak hero-light-leak--animated"
+        style={{ position: 'absolute', top: '-20%', left: '-20%', zIndex: 3, pointerEvents: 'none' }}
       />
 
       <div className="hero-progress-track">
-        <motion.div
-          key={index}
-          initial={{ width: '0%' }}
-          animate={{ width: '100%' }}
-          transition={{ duration: 6, ease: 'linear' }}
-          style={{ height: '100%', background: 'var(--fire)', boxShadow: '0 0 10px var(--fire)' }}
-        />
+        <div key={index} className="hero-progress-fill" />
       </div>
 
       <div className="hero-dots" role="tablist" aria-label="Hero slides">
-        {heroImages.map((slide, i) => (
+        {HERO_SLIDES.map((s, i) => (
           <button
-            key={slide.title}
+            key={s.title}
             type="button"
             role="tab"
             aria-selected={i === index}
-            aria-label={`Show slide ${i + 1}: ${slide.title}`}
+            aria-label={`Show slide ${i + 1}: ${s.title}`}
             className={`hero-dot ${i === index ? 'hero-dot--active' : 'hero-dot--idle'}`}
             onClick={() => setIndex(i)}
           />

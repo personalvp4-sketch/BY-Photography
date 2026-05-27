@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import logo from '../assets/logo.webp';
 
 const NAV_ITEMS = [
@@ -13,14 +12,22 @@ const NAV_ITEMS = [
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const scrollTick = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      if (scrollTick.current) return;
+      scrollTick.current = window.requestAnimationFrame(() => {
+        scrollTick.current = 0;
+        setIsScrolled(window.scrollY > 50);
+      });
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTick.current) cancelAnimationFrame(scrollTick.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -34,29 +41,12 @@ const Navbar = () => {
     };
   }, [menuOpen]);
 
-  const navBar = {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    zIndex: 50,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingLeft: 'clamp(12px, 4vw, 20px)',
-    paddingRight: 'clamp(12px, 4vw, 20px)',
-    paddingTop: isScrolled ? 14 : 24,
-    paddingBottom: isScrolled ? 14 : 24,
-    backgroundColor: isScrolled ? 'var(--obsidian)' : 'transparent',
-    borderBottom: isScrolled ? '1px solid rgba(255, 69, 0, 0.2)' : '1px solid transparent',
-    boxShadow: isScrolled ? '0 4px 20px rgba(0, 0, 0, 0.45)' : 'none',
-    transition:
-      'background-color 0.35s ease, padding 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
-  };
-
   return (
     <>
-      <motion.nav initial={{ y: -100 }} animate={{ y: 0 }} style={navBar}>
+      <nav
+        className={`nav-shell${isScrolled ? ' nav-shell--scrolled' : ''}`}
+        aria-label="Primary"
+      >
         <div
           className="container"
           style={{
@@ -115,48 +105,33 @@ const Navbar = () => {
             {menuOpen ? '✕' : '☰'}
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
-      <AnimatePresence>
-        {menuOpen && (
-          <>
-            <motion.button
-              key="nav-backdrop"
-              type="button"
-              aria-label="Close menu"
-              className="mobile-nav-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMenuOpen(false)}
-            />
-            <motion.nav
-              key="nav-panel"
-              id="mobile-nav"
-              className="mobile-nav-panel"
-              role="dialog"
-              aria-modal="true"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {NAV_ITEMS.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {item.label}
-                </a>
-              ))}
-              <a href="/#contact" onClick={() => setMenuOpen(false)}>
-                INQUIRE
-              </a>
-            </motion.nav>
-          </>
-        )}
-      </AnimatePresence>
+      <button
+        type="button"
+        className={`mobile-nav-backdrop${menuOpen ? ' is-open' : ''}`}
+        aria-label="Close menu"
+        aria-hidden={!menuOpen}
+        tabIndex={menuOpen ? 0 : -1}
+        onClick={() => setMenuOpen(false)}
+      />
+
+      <nav
+        id="mobile-nav"
+        className={`mobile-nav-panel${menuOpen ? ' is-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-hidden={!menuOpen}
+      >
+        {NAV_ITEMS.map((item) => (
+          <a key={item.href} href={item.href} onClick={() => setMenuOpen(false)}>
+            {item.label}
+          </a>
+        ))}
+        <a href="/#contact" onClick={() => setMenuOpen(false)}>
+          INQUIRE
+        </a>
+      </nav>
     </>
   );
 };
