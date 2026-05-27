@@ -2311,12 +2311,15 @@ select.input-glass option {
   min-height: 0;
   width: 100%;
   position: relative;
+  /* Keeps tile height when poster/video has not painted yet (mobile tap-to-play). */
+  aspect-ratio: 4 / 3;
 }
 
 .lazy-video-mobile-poster {
   position: relative;
   display: block;
   width: 100%;
+  min-height: clamp(10rem, 52vw, 14rem);
   height: 100%;
   padding: 0;
   margin: 0;

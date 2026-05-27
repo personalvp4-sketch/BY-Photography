@@ -1,14 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
  * Defers WebM until near viewport; shows poster first; on narrow viewports uses a
  * static image until the user taps to play (saves ~10MB+ decode on mobile).
+ *
+ * When `fallbackImg` is set, it is preferred for the narrow "tap to play" still
+ * (`*-poster.webp` from CI is often missing if ffmpeg did not run).
  */
 export default function LazyAutoplayVideo({ src, poster, fallbackImg, className }) {
   const videoRef = useRef(null);
   const [shouldLoad, setShouldLoad] = useState(false);
   const [narrow, setNarrow] = useState(false);
   const [mobilePlay, setMobilePlay] = useState(false);
+  const [mobileImgSrc, setMobileImgSrc] = useState(() => fallbackImg || poster || '');
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -57,8 +61,20 @@ export default function LazyAutoplayVideo({ src, poster, fallbackImg, className 
     };
   }, [loadVideo, src]);
 
-  const posterUrl = poster || fallbackImg;
-  const showMobilePoster = narrow && posterUrl && !mobilePlay;
+  const videoPoster = poster || fallbackImg;
+  const narrowStaticSrc = fallbackImg || poster;
+  const showMobilePoster = narrow && narrowStaticSrc && !mobilePlay;
+
+  useEffect(() => {
+    setMobileImgSrc(fallbackImg || poster || '');
+  }, [fallbackImg, poster]);
+
+  const onMobileImgError = useCallback(() => {
+    setMobileImgSrc((prev) => {
+      if (prev === fallbackImg && poster) return poster;
+      return prev;
+    });
+  }, [fallbackImg, poster]);
 
   return (
     <div className="lazy-video-root">
@@ -70,12 +86,13 @@ export default function LazyAutoplayVideo({ src, poster, fallbackImg, className 
           onClick={() => setMobilePlay(true)}
         >
           <img
-            src={posterUrl}
+            src={mobileImgSrc || narrowStaticSrc || undefined}
             alt=""
             className={className}
             loading="lazy"
             decoding="async"
             draggable={false}
+            onError={onMobileImgError}
           />
           <span className="lazy-video-play-icon" aria-hidden>
             ▶
@@ -91,7 +108,7 @@ export default function LazyAutoplayVideo({ src, poster, fallbackImg, className 
         loop
         playsInline
         preload="none"
-        poster={posterUrl || undefined}
+        poster={videoPoster || undefined}
         aria-hidden={true}
       />
     </div>
