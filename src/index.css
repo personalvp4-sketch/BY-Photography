@@ -1029,6 +1029,37 @@ p {
   box-sizing: border-box;
 }
 
+/* Mobile: keep headline in upper area; pin CTAs above carousel dots (was centered over subject). */
+@media (max-width: 767.98px) {
+  .hero-content-stage {
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-top: clamp(4.75rem, 11vw, 6rem);
+    padding-bottom: 0;
+  }
+
+  .hero-copy {
+    flex: 1 1 auto;
+    min-height: 0;
+    justify-content: flex-start;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    /* Dots ~bottom 1.25rem + pill + progress bar + tap comfort */
+    padding-bottom: calc(4.85rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .hero-title {
+    margin-bottom: clamp(0.5rem, 2vw, 1rem);
+  }
+
+  .hero-cta-row {
+    margin-top: auto;
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
 .hero-title {
   font-family: var(--font-serif);
   font-weight: 700;
