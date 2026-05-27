@@ -168,9 +168,11 @@ const CinematicHero = () => {
             zIndex: 2,
           }}
         >
-          <div key={slide.title} className="hero-caption-inner">
-            <span className="hero-eyebrow">{slide.subtitle}</span>
-            <h1 className="hero-title">{slide.title}</h1>
+          <div key={slide.title} className="hero-caption-wrap">
+            <div className="hero-caption-inner">
+              <span className="hero-eyebrow">{slide.subtitle}</span>
+              <h1 className="hero-title">{slide.title}</h1>
+            </div>
           </div>
 
           <div className="hero-cta-row hero-cta-row--enter d-flex gap-3 justify-content-center flex-wrap">

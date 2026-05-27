@@ -1029,7 +1029,12 @@ p {
   box-sizing: border-box;
 }
 
-/* Mobile: keep headline in upper area; pin CTAs above carousel dots (was centered over subject). */
+/* Desktop / tablet: wrapper is transparent so headline + CTAs stay one centered column */
+.hero-caption-wrap {
+  display: contents;
+}
+
+/* Narrow: headline stays visually centered; CTAs sit just above dots (full bottom). */
 @media (max-width: 767.98px) {
   .hero-content-stage {
     justify-content: flex-start;
@@ -1038,25 +1043,34 @@ p {
     padding-bottom: 0;
   }
 
+  .hero-caption-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+  }
+
   .hero-copy {
     flex: 1 1 auto;
     min-height: 0;
-    justify-content: flex-start;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
-    /* Dots ~bottom 1.25rem + pill + progress bar + tap comfort */
+  }
+
+  .hero-cta-row {
+    flex-shrink: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
+    max-width: 100%;
     padding-bottom: calc(4.85rem + env(safe-area-inset-bottom, 0px));
   }
 
   .hero-title {
-    margin-bottom: clamp(0.5rem, 2vw, 1rem);
-  }
-
-  .hero-cta-row {
-    margin-top: auto;
-    margin-bottom: 0;
-    width: 100%;
-    max-width: 100%;
+    margin-bottom: clamp(0.25rem, 1.2vw, 0.5rem);
   }
 }
 
