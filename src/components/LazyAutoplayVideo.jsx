@@ -12,7 +12,8 @@ export default function LazyAutoplayVideo({ src, poster, fallbackImg, className 
   const [shouldLoad, setShouldLoad] = useState(false);
   const [narrow, setNarrow] = useState(false);
   const [mobilePlay, setMobilePlay] = useState(false);
-  const [mobileImgSrc, setMobileImgSrc] = useState(() => fallbackImg || poster || '');
+  /** If primary (fallbackImg || poster) fails, try poster when both exist. Reset via parent `key`. */
+  const [usePosterAfterPrimaryError, setUsePosterAfterPrimaryError] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 767px)');
@@ -65,16 +66,15 @@ export default function LazyAutoplayVideo({ src, poster, fallbackImg, className 
   const narrowStaticSrc = fallbackImg || poster;
   const showMobilePoster = narrow && narrowStaticSrc && !mobilePlay;
 
-  useEffect(() => {
-    setMobileImgSrc(fallbackImg || poster || '');
-  }, [fallbackImg, poster]);
+  const narrowPrimary = (fallbackImg || poster || '').trim();
+  const narrowMobileImgSrc =
+    usePosterAfterPrimaryError && poster && fallbackImg ? poster : narrowPrimary;
 
   const onMobileImgError = useCallback(() => {
-    setMobileImgSrc((prev) => {
-      if (prev === fallbackImg && poster) return poster;
-      return prev;
-    });
-  }, [fallbackImg, poster]);
+    if (fallbackImg && poster && !usePosterAfterPrimaryError) {
+      setUsePosterAfterPrimaryError(true);
+    }
+  }, [fallbackImg, poster, usePosterAfterPrimaryError]);
 
   return (
     <div className="lazy-video-root">
@@ -86,7 +86,7 @@ export default function LazyAutoplayVideo({ src, poster, fallbackImg, className 
           onClick={() => setMobilePlay(true)}
         >
           <img
-            src={mobileImgSrc || narrowStaticSrc || undefined}
+            src={narrowMobileImgSrc || undefined}
             alt=""
             className={className}
             loading="lazy"

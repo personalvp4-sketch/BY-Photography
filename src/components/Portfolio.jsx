@@ -84,6 +84,7 @@ const Portfolio = () => {
                 <div className="portfolio-tile-media">
                   {img.videoSrc ? (
                     <LazyAutoplayVideo
+                      key={`${img.videoSrc}|${img.poster ?? ''}|${img.mobileFallback ?? ''}`}
                       className="portfolio-tile-cover"
                       src={img.videoSrc}
                       poster={img.poster}
