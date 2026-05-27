@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  * Defers WebM until near viewport; shows poster first; on narrow viewports uses a
  * static image until the user taps to play (saves ~10MB+ decode on mobile).
  *
- * When `fallbackImg` is set, it is preferred for the narrow "tap to play" still
- * (`*-poster.webp` from CI is often missing if ffmpeg did not run).
+ * When `fallbackImg` is set, it is preferred for the narrow "tap to play" still.
+ * Optional `poster` URL is only used when provided (avoid missing generated files).
  */
 export default function LazyAutoplayVideo({ src, poster, fallbackImg, className }) {
   const videoRef = useRef(null);

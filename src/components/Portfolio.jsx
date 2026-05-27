@@ -36,7 +36,6 @@ const tiles = [
     title: 'Cinematic Portfolio',
     slug: 'cinematic-portfolio',
     videoSrc: '/portfolio/Gowri Intro.webm',
-    poster: '/portfolio/Gowri Intro-poster.webp',
     mobileFallback: '/assets/hero/53.webp',
   },
   {
@@ -84,7 +83,7 @@ const Portfolio = () => {
                 <div className="portfolio-tile-media">
                   {img.videoSrc ? (
                     <LazyAutoplayVideo
-                      key={`${img.videoSrc}|${img.poster ?? ''}|${img.mobileFallback ?? ''}`}
+                      key={`${img.videoSrc}|${img.mobileFallback ?? ''}`}
                       className="portfolio-tile-cover"
                       src={img.videoSrc}
                       poster={img.poster}

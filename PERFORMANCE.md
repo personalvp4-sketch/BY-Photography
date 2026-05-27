@@ -20,7 +20,7 @@ npm run generate:responsive-images:dry-run
 ### 2. Video (homepage portfolio tile + gallery grid)
 
 - **Portfolio WebM**: `LazyAutoplayVideo` — **IntersectionObserver**, **`preload="none"`**, **`poster`**, desktop loads when near viewport; **≤767px** shows **poster / fallback image** until the user taps **play** (avoids multi‑MB decode on cellular).
-- **Gallery grid**: **`GalleryVideoThumb`** uses **`{name}-poster.webp`** only (no WebM in the grid). Posters are generated when **ffmpeg** is available (same script). Lightbox still uses full **WebM** with controls.
+- **Gallery grid**: **`GalleryVideoThumb`** lazy-loads **`<video preload="metadata">`** near the viewport so the first frame can show **without** separate `*-poster.webp` files (those are optional ffmpeg outputs and are often missing in CI).
 
 ```bash
 # Re-encode heavy WebM (requires ffmpeg on PATH — see scripts/optimize-videos.mjs)
