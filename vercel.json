@@ -1,7 +1,6 @@
 {
   "version": 2,
   "framework": "vite",
-  "cleanUrls": true,
   "trailingSlash": false,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
