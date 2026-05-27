@@ -36,7 +36,8 @@ const tiles = [
     title: 'Cinematic Portfolio',
     slug: 'cinematic-portfolio',
     videoSrc: '/portfolio/Gowri Intro.webm',
-    mobileFallback: '/assets/hero/53.webp',
+    /** Distinct from Pre Wedding tile (`53`); matches hero “cinema” slide. */
+    mobileFallback: '/assets/hero/MAH09784.webp',
   },
   {
     id: 4,
